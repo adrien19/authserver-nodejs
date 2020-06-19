@@ -11,13 +11,16 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
-      firstName: {
+      username: {
         type: Sequelize.STRING
       },
-      lastName: {
+      username: {
         type: Sequelize.STRING
       },
-      role: {
+      firstname: {
+        type: Sequelize.STRING
+      },
+      lastname: {
         type: Sequelize.STRING
       },
       createdAt: {
