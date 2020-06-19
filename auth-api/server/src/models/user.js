@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   User.associate = function(models) {
     // associations can be defined here
-    User.belongsToMany(models.Role, { through: 'user_roles', foreignKey: 'userId', otherKey: 'roleId'});
+    User.belongsToMany(models.Role, { through: 'User_Roles', foreignKey: 'userId', otherKey: 'roleId'});
   };
   return User; 
 };

@@ -6,6 +6,7 @@ const models = require('../src/models');
 
 const User = models.User;
 const Role = models.Role;
+const Token = models.Token;
  
 const Op = models.Sequelize.Op;
  
@@ -58,16 +59,99 @@ exports.signin = (req, res) => {
       return res.status(401).send({ auth: false, accessToken: null, reason: "Invalid Password!" });
     }
     
-    var token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, {
-      expiresIn: 86400 // expires in 24 hours
-    });
+    var newToken = generateAccessToken(user.id)
+
+    const refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_SECRET_KEY, {
+      // expiresIn: '2d' // expires in 24 hours
+    })
     
-    res.status(200).send({ auth: true, accessToken: token });
+    // save token of user
+    Token.findOne({
+      where: {
+        userId: user.id
+      }
+    }).then(token => {
+      if (!token) {
+        Token.create({
+          userId: user.id,
+          token: refreshToken
+        }).catch(err => {
+          res.status(500).send('########################## ARROR ACCURRED WHILE SAVING TOKEN #############' + err);
+        });
+      }else{
+        Token.update({
+          token: refreshToken
+        }, { where: { userId: user.id}}).catch(err => {
+          res.status(500).send('########################## THERE WAS AN ARROR SAVING TOKEN #############' + err);
+        });
+      }
+    })    
+    res.status(200).send({ auth: true, accessToken: newToken , refreshToken: refreshToken });
     
   }).catch(err => {
     res.status(500).send('Error -> ' + err);
   });
 }
+
+exports.refreshUserToken = (req, res) => {
+  const refreshToken = req.body.token
+  if (refreshToken === null) {return res.sendStatus(401)}
+
+  Token.findOne({
+    where: {
+      token: refreshToken
+    }
+  }).then(token => {
+    if (!token) {
+      res.sendStatus(401)
+    }else {
+
+      jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY, (err, id) => {
+        if(err) return res.sendStatus(403)
+        const accessToken = generateAccessToken(id)
+        res.json({ accessToken: accessToken })
+      })
+    }
+  })
+}
+
+
+exports.revokeRefreshToken = (req, res) => {
+  const refreshToken = req.body.token
+
+  jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY, (err, userInfo) => {
+    Token.findOne({
+      where: {
+        userId: parseInt(userInfo.id, 10)
+      }
+    }).then(token => {
+      if (token) {
+        Token.destroy({
+          where: {
+            id: token.id
+          }
+        }).catch(err => {
+          throw(err)
+        });
+
+        res.sendStatus(204)
+      }
+    }).catch(err => {
+      res.sendStatus(500)
+    });
+  })
+}
+
+function generateAccessToken(id) {
+  return jwt.sign({ id: id }, process.env.SECRET_KEY, {
+    expiresIn: '30m' // expires in 1 hour
+  })
+}
+
+
+/**
+ * Below for testing the API
+ */
  
 exports.userContent = (req, res) => {
   User.findOne({

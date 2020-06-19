@@ -8,6 +8,10 @@ module.exports = function(app) {
   app.post('/api/auth/signup', [verifySignUp.checkDuplicateUserNameOrEmail, verifySignUp.checkRolesExisted], authController.signup);
   
   app.post('/api/auth/signin', authController.signin);
+
+  app.post('/api/auth/logout', authController.revokeRefreshToken);
+
+  app.post('/api/auth/refreshtoken', authController.refreshUserToken); 
   
   app.get('/api/test/user', [authJwt.verifyToken], authController.userContent);
   
