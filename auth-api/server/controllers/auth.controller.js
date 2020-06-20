@@ -1,4 +1,3 @@
-// const db = require('../src/models');
 
 require('dotenv').config();
 
@@ -161,7 +160,7 @@ exports.userContent = (req, res) => {
       model: Role,
       attributes: ['id', 'name'],
       through: {
-        attributes: ['userId', 'roleId'],
+        attributes: [],
       }
     }]
   }).then(user => {
@@ -185,14 +184,35 @@ exports.adminBoard = (req, res) => {
       model: Role,
       attributes: ['id', 'name'],
       through: {
-        attributes: ['userId', 'roleId'],
+        attributes: [],
       }
     }]
   }).then(user => {
-    res.status(200).json({
-      "description": "Admin Board",
-      "user": user
-    });
+    User.findAll({
+      where: {id: { [Op.ne]: req.userId }},
+      attributes: ['firstname', 'lastname', 'username', 'email'],
+      include: [{
+        model: Role,
+        attributes: ['id', 'name'],
+        through: {
+          attributes: [],
+        }
+      }]
+    }).then(users => {
+      if (users) {
+        res.status(200).json({
+          "description": "Admin Board",
+          "currentAdmin": user,
+          "users": users
+        });
+      }else{
+        res.status(200).json({
+          "description": "Admin Board",
+          "currentAdmin": user,
+          "users": 'No users found to show!'
+        });
+      }
+    })
   }).catch(err => {
     res.status(500).json({
       "description": "Can not access Admin Board",
@@ -209,14 +229,35 @@ exports.managementBoard = (req, res) => {
       model: Role,
       attributes: ['id', 'name'],
       through: {
-        attributes: ['userId', 'roleId'],
+        attributes: [],
       }
     }]
   }).then(user => {
-    res.status(200).json({
-      "description": "Management Board",
-      "user": user
-    });
+    User.findAll({
+      where: {id: { [Op.ne]: req.userId }},
+      attributes: ['firstname', 'lastname', 'username', 'email'],
+      include: [{
+        model: Role,
+        attributes: ['id', 'name'],
+        through: {
+          attributes: [],
+        }
+      }]
+    }).then(users => {
+      if (users) {
+        res.status(200).json({
+          "description": "Management Board",
+          "currentManager": user,
+          "users": users
+        });
+      }else{
+        res.status(200).json({
+          "description": "Management Board",
+          "currentManager": user,
+          "users": 'No users found to show!'
+        });
+      }
+    })
   }).catch(err => {
     res.status(500).json({
       "description": "Can not access Management Board",

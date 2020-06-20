@@ -13,9 +13,9 @@ module.exports = function(app) {
 
   app.post('/api/auth/refreshtoken', authController.refreshUserToken); 
   
-  app.get('/api/test/user', [authJwt.verifyToken], authController.userContent);
+  app.get('/api/content/user', [authJwt.verifyToken], authController.userContent);
   
-  app.get('/api/test/pm', [authJwt.verifyToken, authJwt.isPmOrAdmin], authController.managementBoard);
+  app.get('/api/content/pm', [authJwt.verifyToken, authJwt.isPmOrAdmin], authController.managementBoard);
   
-  app.get('/api/test/admin', [authJwt.verifyToken, authJwt.isAdmin], authController.adminBoard);
+  app.get('/api/content/admin', [authJwt.verifyToken, authJwt.isAdmin], authController.adminBoard);
 }

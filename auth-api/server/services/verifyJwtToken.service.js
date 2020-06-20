@@ -1,10 +1,7 @@
 const jwt = require('jsonwebtoken');
-// const config = require('../config/config.js'); // Change this to correct db
 require('dotenv').config();
-// const db = require('../src/models');
 const models = require('../src/models');
 
-// const db = require('../config/db.config.js'); // Change this to correct db
 const Role = models.Role;
 const User = models.User;
  
@@ -31,8 +28,7 @@ verifyToken = (req, res, next) => {
 }
  
 isAdmin = (req, res, next) => {
-  
-  User.findById(req.userId)
+  User.findOne({ where: {id: req.userId }})
     .then(user => {
       user.getRoles().then(roles => {
         for(let i=0; i<roles.length; i++){
@@ -46,12 +42,12 @@ isAdmin = (req, res, next) => {
         res.status(403).send("Require Admin Role!");
         return;
       })
-    })
+  })
 }
  
 isPmOrAdmin = (req, res, next) => {
   
-  User.findById(req.userId)
+  User.findOne({ where: {id: req.userId }})
     .then(user => {
       user.getRoles().then(roles => {
         for(let i=0; i<roles.length; i++){          

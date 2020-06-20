@@ -11,7 +11,7 @@ module.exports = {
   development: {
     database: 'auth_database',
     username: 'adrien',
-    password: 'null',
+    password: 'test',
     host: '127.0.0.1',
     dialect: 'postgres'
   },
@@ -19,7 +19,7 @@ module.exports = {
   test: {
     database: 'auth_database_test',
     username: 'adrien',
-    password: null,
+    password: 'test',
     host: '127.0.0.1',
     dialect: 'postgres'
   },

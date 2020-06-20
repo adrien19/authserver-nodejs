@@ -1,6 +1,5 @@
 
 require('dotenv').config();
-// const db = require('../src/models');
 const models = require('../src/models');
 
 const ROLEs = process.env.ROLEs; 
