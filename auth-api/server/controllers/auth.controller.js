@@ -129,10 +129,11 @@ exports.revokeRefreshToken = (req, res) => {
           where: {
             id: token.id
           }
-        }).catch(err => {
+        }).then(
+          res.sendStatus(200).send('Successfully logged out!')
+        ).catch(err => {
           throw(err)
         });
-
         res.sendStatus(204)
       }
     }).catch(err => {

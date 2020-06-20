@@ -4,7 +4,7 @@
   "description": "Auth Server",
   "main": "index.js",
   "scripts": {
-    "devStart": "nodemon ./auth-api/index.js"
+    "devStart": "sequelize db:migrate && nodemon ./auth-api/index.js"
   },
   "keywords": [
     "nodejs",
