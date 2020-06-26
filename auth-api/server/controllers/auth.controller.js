@@ -43,21 +43,36 @@ exports.signup = (req, res) => {
  
 exports.signin = (req, res) => {
   console.log("Sign-In");
-  
+
   User.findOne({
     where: {
-      username: req.body.username
-    }
+      username: req.body.username.input
+    },
+    // attributes: ['firstname', 'lastname', 'username', 'email'],
+    include: [{
+      model: Role,
+      attributes: ['id', 'name'],
+      through: {
+        attributes: [],
+      }
+    }]
   }).then(user => {
     if (!user) {
       return res.status(404).send('User Not Found.');
     }
- 
-    var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+
+    var passwordIsValid = bcrypt.compareSync(req.body.password.input, user.password);
     if (!passwordIsValid) {
       return res.status(401).send({ auth: false, accessToken: null, reason: "Invalid Password!" });
     }
-    
+    const userInfo = {
+      username: user.username,
+      email: user.email,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      roles: user.Roles
+    }
+
     var newToken = generateAccessToken(user.id)
 
     const refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_SECRET_KEY, {
@@ -85,7 +100,7 @@ exports.signin = (req, res) => {
         });
       }
     })    
-    res.status(200).send({ auth: true, accessToken: newToken , refreshToken: refreshToken });
+    return res.status(200).send({ userInfo: userInfo, auth: true, accessToken: newToken , refreshToken: refreshToken });
     
   }).catch(err => {
     res.status(500).send('Error -> ' + err);
@@ -125,6 +140,8 @@ exports.revokeRefreshToken = (req, res) => {
       }
     }).then(token => {
       if (token) {
+        console.table({message: "GOIGN TO DESTROY TOKEN"});
+
         Token.destroy({
           where: {
             id: token.id
@@ -134,9 +151,11 @@ exports.revokeRefreshToken = (req, res) => {
         ).catch(err => {
           throw(err)
         });
-        res.sendStatus(204)
       }
-    }).catch(err => {
+
+      res.sendStatus(204) // No token was found!!
+
+      }).catch(err => {
       res.sendStatus(500)
     });
   })
