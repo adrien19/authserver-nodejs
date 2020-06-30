@@ -5,10 +5,13 @@ const models = require('../src/models');
 const Role = models.Role;
 const User = models.User;
  
-verifyToken = (req, res, next) => {
+verifyToken = (req, res, next) => {  
+  const providedId = req.body.id;
+  console.table(req.body);
+  
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]
-
+  
   if (!token){
     return res.status(403).send({ 
       auth: false, message: 'No token provided.' 
@@ -22,8 +25,15 @@ verifyToken = (req, res, next) => {
           message: 'Fail to Authentication. Error -> ' + err 
         });
     }
-    req.userId = decoded.id;
-    next();
+    if (providedId) {
+      req.userId = providedId;
+      console.log(" at verifyToken -> THERE IS AN ID PROVIDED");
+      
+      next();
+    }else {
+      req.userId = decoded.id;
+      next();
+    }
   });
 }
  

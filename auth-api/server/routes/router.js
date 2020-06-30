@@ -13,7 +13,7 @@ module.exports = function(app) {
 
   app.post('/api/auth/refreshtoken', authController.refreshUserToken); 
   
-  app.get('/api/content/user', [authJwt.verifyToken], authController.userContent);
+  app.post('/api/content/user', [authJwt.verifyToken], authController.userContent);
   
   app.get('/api/content/pm', [authJwt.verifyToken, authJwt.isPmOrAdmin], authController.managementBoard);
   

@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
+
+  // console.table({ token: req });
+
   res.setHeader('Access-Control-Allow-Origin', "*");
   res.setHeader(
       'Access-Control-Allow-Methods',
@@ -22,11 +25,11 @@ const db = require('./server/src/models');
 
 const Role = db.Role; 
 
-db.sequelize.sync();
-// db.sequelize.sync({ force: true }).then(() => {
-//    console.log("Drop and re-sync db.");
-//    initial();
-// });
+// db.sequelize.sync();
+db.sequelize.sync({ force: true }).then(() => {
+   console.log("Drop and re-sync db.");
+   initial();
+});
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -52,4 +55,4 @@ function initial(){
      id: 3,
      name: "PM"
    });
-}
+} 

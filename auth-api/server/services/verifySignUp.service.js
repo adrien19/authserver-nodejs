@@ -8,7 +8,7 @@ const Role = models.Role;
  
 checkDuplicateUserNameOrEmail = (req, res, next) => {
   // -> Check Username is already in use
-
+   
   User.findOne({
     where: {
       username: req.body.username
@@ -32,7 +32,7 @@ checkDuplicateUserNameOrEmail = (req, res, next) => {
       next();
     });
   }).catch( err => {
-    res.status(200).send(err);
+    res.status(500).send(err);
   });
 }
  

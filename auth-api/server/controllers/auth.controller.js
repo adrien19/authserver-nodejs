@@ -46,7 +46,7 @@ exports.signin = (req, res) => {
 
   User.findOne({
     where: {
-      username: req.body.username.input
+      username: req.body.username
     },
     // attributes: ['firstname', 'lastname', 'username', 'email'],
     include: [{
@@ -61,11 +61,12 @@ exports.signin = (req, res) => {
       return res.status(404).send('User Not Found.');
     }
 
-    var passwordIsValid = bcrypt.compareSync(req.body.password.input, user.password);
+    var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
     if (!passwordIsValid) {
       return res.status(401).send({ auth: false, accessToken: null, reason: "Invalid Password!" });
     }
     const userInfo = {
+      id: user.id,
       username: user.username,
       email: user.email,
       firstname: user.firstname,
@@ -73,9 +74,9 @@ exports.signin = (req, res) => {
       roles: user.Roles
     }
 
-    var newToken = generateAccessToken(user.id)
+    var newToken = generateAccessToken(user.id, user.Roles)
 
-    const refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_SECRET_KEY, {
+    const refreshToken = jwt.sign({ id: user.id, roles: user.Roles }, process.env.REFRESH_SECRET_KEY, {
       // expiresIn: '2d' // expires in 24 hours
     })
     
@@ -161,8 +162,8 @@ exports.revokeRefreshToken = (req, res) => {
   })
 }
 
-function generateAccessToken(id) {
-  return jwt.sign({ id: id }, process.env.SECRET_KEY, {
+function generateAccessToken(id, roles) {
+  return jwt.sign({ id: id, roles: roles}, process.env.SECRET_KEY, {
     expiresIn: '30m' // expires in 1 hour
   })
 }
@@ -175,7 +176,7 @@ function generateAccessToken(id) {
 exports.userContent = (req, res) => {
   User.findOne({
     where: {id: req.userId},
-    attributes: ['firstname', 'lastname', 'username', 'email'],
+    attributes: ['id', 'firstname', 'lastname', 'username', 'email'],
     include: [{
       model: Role,
       attributes: ['id', 'name'],
