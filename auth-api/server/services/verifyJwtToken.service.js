@@ -7,8 +7,7 @@ const User = models.User;
  
 verifyToken = (req, res, next) => {  
   const providedId = req.body.id;
-  console.table(req.body);
-  
+
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]
   
@@ -27,8 +26,7 @@ verifyToken = (req, res, next) => {
     }
     if (providedId) {
       req.userId = providedId;
-      console.log(" at verifyToken -> THERE IS AN ID PROVIDED");
-      
+
       next();
     }else {
       req.userId = decoded.id;
