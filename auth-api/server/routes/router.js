@@ -14,6 +14,8 @@ module.exports = function(app) {
   app.post('/api/auth/refreshtoken', authController.refreshUserToken); 
   
   app.post('/api/content/user', [authJwt.verifyToken], authController.userContent);
+
+  app.post('/api/content/users', [authJwt.verifyToken], authController.multiUsersContent);
   
   app.get('/api/content/pm', [authJwt.verifyToken, authJwt.isPmOrAdmin], authController.managementBoard);
   

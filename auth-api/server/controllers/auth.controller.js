@@ -195,6 +195,27 @@ exports.userContent = (req, res) => {
       "error": err
     });
   })
+} 
+
+exports.multiUsersContent = (req, res) => {
+  User.findAll({
+    where: {
+      id: {
+        [Op.in]: req.body.userIds
+      }
+    },
+    attributes: ['id', 'firstname', 'lastname', 'username', 'email']
+  }).then(users => {
+    res.status(200).json({
+      "description": "User Content Page",
+      "users": users
+    });
+  }).catch(err => {
+    res.status(500).json({
+      "description": "Can not access User Page",
+      "error": err
+    });
+  })
 }
  
 exports.adminBoard = (req, res) => {
