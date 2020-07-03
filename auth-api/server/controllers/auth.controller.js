@@ -121,9 +121,9 @@ exports.refreshUserToken = (req, res) => {
       res.sendStatus(401)
     }else {
 
-      jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY, (err, id, roles) => {
+      jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY, (err, data) => {
         if(err) return res.sendStatus(403)
-        const accessToken = generateAccessToken(id, roles)
+        const accessToken = generateAccessToken(data.id, data.roles)
         res.json({ accessToken: accessToken })
       })
     }
