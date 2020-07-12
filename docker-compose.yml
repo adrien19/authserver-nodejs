@@ -1,0 +1,89 @@
+# Please refer https://docs.docker.com/compose to learn more about Docker Compose.
+
+# This is a sample docker-compose file with two services
+# 1. yourwebapp is an sample web service where the docker container image will be built from the Dockerfile as
+#    part of starting the compose.
+# 2. redis is an existing image hosted in docker hub.
+version: '3.4'
+
+services:
+  auth_api:
+    image: auth_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth_api
+    # restart: unless-stopped
+    env_file: 
+      - .env
+    depends_on: 
+      - auth_database
+    command: ["./scripts/wait-for-it.sh", "postgresForDevAuthServer:5432", "--", "npm", "run", "devStart"]
+    networks:
+      auth-applications-network:
+        # Other applications to communicate with the database using this hostname
+        aliases:
+          - auth_api
+      net_scorecard_backend:
+    ports:
+      - 500:500
+
+  auth_database:
+    image: postgres
+    restart: always
+    env_file:
+      - ./database.config.env # configure dev postgres
+    networks:
+      auth-applications-network:
+        # Other applications to communicate with the database using this hostname
+        aliases:
+          - postgresForDevAuthServer
+    ports:
+      - 5432:5432
+
+  # auth_database_prod:
+  #   image: postgres:9.6.3
+  #   restart: always
+  #   # More on logging with Postgres: https://www.postgresql.org/docs/current/static/runtime-config-logging.html
+  #   command: postgres -c logging_collector=on -c log_destination=stderr -c log_directory=/logs
+  #   env_file:
+  #     - ./.env # configure prod postgres
+  #   # environment:
+  #   #   # Providing the password via an environment variable. If the variable is unset or empty, use a default password
+  #   #   - POSTGRES_DB= ${DB_NAME}
+  #   #   - POSTGRES_USER= ${DB_USER}
+  #   #   - POSTGRES_PASSWORD= ${DB_PASS}
+  #   volumes:
+  #     # Persisting the data between container invocations
+  #     - postgresVolume:/var/lib/postgresql/data
+  #     - ./logs:/logs
+  #   networks:
+  #     auth-applications-network:
+  #       # Other applications to communicate with the database using this hostname
+  #       aliases:
+  #         - postgresForAuthServer
+  #   ports:
+  #     - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      auth-applications-network:
+        # Our application can communicate with the database using this hostname
+        aliases:
+          - adminerForPostgres
+    ports:
+      - 8080:8080
+
+
+networks:
+  auth-applications-network:
+    driver: bridge 
+  net_scorecard_backend: 
+    external: true
+
+# Creating a named volume to persist data. When on a non-Linux OS, the volume's data will be in the Docker VM
+# (e.g., MobyLinuxVM) in /var/lib/docker/volumes/
+volumes:
+  postgresVolume:

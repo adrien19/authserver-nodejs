@@ -1,6 +1,5 @@
 
 *.config.*
-*.yml
 
 ####### BELOW NON USER CREATED SPECIFIC ##########
 # Logs

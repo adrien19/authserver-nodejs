@@ -164,7 +164,7 @@ exports.revokeRefreshToken = (req, res) => {
 
 function generateAccessToken(id, roles) {
   return jwt.sign({ id: id, roles: roles}, process.env.SECRET_KEY, {
-    expiresIn: '30m' // expires in 1 hour
+    expiresIn: '2m' // expires in 1 hour
   })
 }
 

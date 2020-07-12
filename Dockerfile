@@ -1,15 +1,12 @@
-# FROM debian:latest
+FROM node:12.18.2-stretch-slim
 
-# RUN apt-get update && apt-get install -qq -y \
-#     shellcheck \
-#   && rm -rf /var/lib/apt/lists/*
+RUN npm install -g nodemon
+RUN npm install -g sequelize-cli
+RUN mkdir -p /auth/development
 
-# WORKDIR /usr/src/app/
+WORKDIR /auth/development
+COPY . .
+RUN npm install 
+RUN ["chmod", "+x", "./scripts/wait-for-it.sh"]
 
-# COPY . /usr/src/app/
-
-FROM postgres:9.6.3
-ENV POSTGRES_USER adrien
-ENV POSTGRES_PASSWORD adrien
-ENV POSTGRES_DB auth_database_prod
-EXPOSE 5432
+# CMD ["npm", "run", "devStart"]

@@ -12,8 +12,8 @@ module.exports = {
     database: 'auth_database',
     username: 'adrien',
     password: 'test',
-    host: '127.0.0.1',
-    port: '5000',
+    host: 'postgresForDevAuthServer',
+    port: '5432',
     dialect: 'postgres'
   },
 
